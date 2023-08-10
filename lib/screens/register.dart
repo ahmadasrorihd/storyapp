@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'login.dart';
+
 class Register extends StatefulWidget {
   const Register({super.key});
 
@@ -66,7 +68,7 @@ class _RegisterState extends State<Register> {
                 textColor: Colors.white,
                 onPressed: () {},
                 child: const Text(
-                  "Login",
+                  "Register",
                   style: TextStyle(
                     fontSize: 14.0,
                     color: Colors.white,
@@ -76,8 +78,24 @@ class _RegisterState extends State<Register> {
               const SizedBox(
                 height: 30,
               ),
-              const Row(
-                children: [Text('Sudah punya akun ? '), Text('Daftar disini ')],
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Sudah punya akun ? '),
+                  InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const Login()),
+                        );
+                      },
+                      child: const Text(
+                        'Login disini ',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, color: Colors.blue),
+                      ))
+                ],
               )
             ],
           )),

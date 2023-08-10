@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:story_app/screens/register.dart';
+
+import 'list_story.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -52,9 +55,14 @@ class _LoginState extends State<Login> {
                 minWidth: double.infinity,
                 color: Colors.blue,
                 textColor: Colors.white,
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ListStory()),
+                  );
+                },
                 child: const Text(
-                  "Login",
+                  "Masuk",
                   style: TextStyle(
                     fontSize: 14.0,
                     color: Colors.white,
@@ -64,9 +72,24 @@ class _LoginState extends State<Login> {
               const SizedBox(
                 height: 30,
               ),
-              const Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [Text('Belum punya akun ? '), Text('Daftar disini ')],
+                children: [
+                  const Text('Belum punya akun ? '),
+                  InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const Register()),
+                        );
+                      },
+                      child: const Text(
+                        'Daftar disini ',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, color: Colors.blue),
+                      ))
+                ],
               )
             ],
           )),
