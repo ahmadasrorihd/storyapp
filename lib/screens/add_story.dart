@@ -15,7 +15,7 @@ class _AddStoryState extends State<AddStory> {
         title: const Text('Add New Story'),
       ),
       body: Container(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Form(
             child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
