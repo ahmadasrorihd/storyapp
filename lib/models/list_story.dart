@@ -38,8 +38,8 @@ class ListStory {
   String description;
   String photoUrl;
   DateTime createdAt;
-  double lat;
-  double lon;
+  dynamic lat;
+  dynamic lon;
 
   ListStory({
     required this.id,

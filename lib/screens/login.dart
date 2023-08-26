@@ -1,10 +1,16 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:story_app/models/login.dart';
+import 'package:story_app/screens/list_story.dart';
 import 'package:story_app/screens/register.dart';
-import 'package:provider/provider.dart';
+import 'package:story_app/utils/constant.dart';
+import 'package:story_app/utils/validator.dart';
 
-import '../providers/api_provider.dart';
+import '../core/api_client.dart';
 
 class Login extends StatefulWidget {
+  static String routeName = "/login";
   const Login({super.key});
 
   @override
@@ -15,29 +21,42 @@ class _LoginState extends State<Login> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
-  // Future loginSuccess() async {
-  //   if (_formKey.currentState!.validate()) {
-  //     SharedPreferences prefs = await SharedPreferences.getInstance();
-  //     prefs.setString(keyUserId, data!.userId!);
-  //     prefs.setString(keyName, data.name!);
-  //     prefs.setString(keyToken, data.token!);
-  //     prefs.setBool(keyIsLogin, true);
-  //     Navigator.push(
-  //       context,
-  //       MaterialPageRoute(builder: (context) => const ListStory()),
-  //     );
-  //   }
-  // }
-
-  @override
-  void initState() {
-    super.initState();
-    Provider.of<ApiProvider>(context, listen: false);
-  }
+  final ApiClient _apiClient = ApiClient();
 
   @override
   Widget build(BuildContext context) {
+    Future<void> login() async {
+      if (_formKey.currentState!.validate()) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: const Text('Processing Data'),
+          backgroundColor: Colors.green.shade300,
+        ));
+
+        try {
+          LoginResult res = await _apiClient.login(
+            emailController.text,
+            passwordController.text,
+          );
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString(keyName, res.loginResult.name);
+          prefs.setString(keyUserId, res.loginResult.userId);
+          prefs.setString(keyToken, res.loginResult.token);
+          prefs.setBool(keyIsLogin, true);
+          if (context.mounted) {
+            Navigator.pushNamed(context, ListStory.routeName)
+                .then((value) => _formKey.currentState?.reset());
+          }
+        } on DioException catch (e) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(e.response!.data.toString()),
+              backgroundColor: Colors.red.shade300,
+            ));
+          }
+        }
+      }
+    }
+
     return Scaffold(
       body: SafeArea(
         child: Container(
@@ -53,6 +72,9 @@ class _LoginState extends State<Login> {
                     height: 30,
                   ),
                   TextFormField(
+                    validator: (value) {
+                      return Validator.validateEmail(value ?? "");
+                    },
                     controller: emailController,
                     decoration: InputDecoration(
                       hintText: "Email",
@@ -66,6 +88,9 @@ class _LoginState extends State<Login> {
                     height: 8,
                   ),
                   TextFormField(
+                    validator: (value) {
+                      return Validator.validateText(value ?? "", 'Password');
+                    },
                     controller: passwordController,
                     decoration: InputDecoration(
                       hintText: "Password",
@@ -78,41 +103,19 @@ class _LoginState extends State<Login> {
                   const SizedBox(
                     height: 30,
                   ),
-                  Consumer<ApiProvider>(
-                    builder: (context, data, child) {
-                      if (data.loading) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-                      if (data.loginResult.error) {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text(data.loginResult.message),
-                          backgroundColor: Colors.red.shade300,
-                          duration: const Duration(seconds: 3),
-                        ));
-                      } else {
-                        return Text('login success');
-                      }
-
-                      return MaterialButton(
-                        height: 46.0,
-                        minWidth: double.infinity,
-                        color: Colors.blue,
-                        textColor: Colors.white,
-                        onPressed: () {
-                          data.login(
-                              emailController.text, passwordController.text);
-                        },
-                        child: const Text(
-                          "Login",
-                          style: TextStyle(
-                            fontSize: 14.0,
-                            color: Colors.white,
-                          ),
-                        ),
-                      );
-                    },
+                  MaterialButton(
+                    height: 46.0,
+                    minWidth: double.infinity,
+                    color: Colors.blue,
+                    textColor: Colors.white,
+                    onPressed: login,
+                    child: const Text(
+                      "Login",
+                      style: TextStyle(
+                        fontSize: 14.0,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                   const SizedBox(
                     height: 30,

@@ -1,10 +1,13 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:story_app/models/register.dart';
 
-import '../providers/api_provider.dart';
+import '../core/api_client.dart';
+import '../utils/validator.dart';
 import 'login.dart';
 
 class Register extends StatefulWidget {
+  static String routeName = "/register";
   const Register({super.key});
 
   @override
@@ -16,37 +19,62 @@ class _RegisterState extends State<Register> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final ApiClient _apiClient = ApiClient();
 
   Future<void> register() async {
     if (_formKey.currentState!.validate()) {
-      final apiProvider = Provider.of<ApiProvider>(context, listen: false);
-      apiProvider.register(
-        nameController.text,
-        emailController.text,
-        passwordController.text,
-      );
-
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: const Text('Processing Data'),
         backgroundColor: Colors.green.shade300,
       ));
 
-      if (!apiProvider.registerResult!.error) {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(apiProvider.registerResult!.message),
-          backgroundColor: Colors.green.shade300,
-        ));
-        Navigator.pop(context);
-      } else {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(apiProvider.errorMessage),
-          backgroundColor: Colors.red.shade300,
-          duration: const Duration(seconds: 3),
-        ));
+      try {
+        RegisterResult res = await _apiClient.register(
+          nameController.text,
+          emailController.text,
+          passwordController.text,
+        );
+        if (context.mounted) {
+          showAlertDialog(context, res.message);
+        }
+      } on DioException catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(e.response!.data.toString()),
+            backgroundColor: Colors.red.shade300,
+          ));
+        }
       }
     }
+  }
+
+  showAlertDialog(BuildContext context, String message) {
+    Widget continueButton = TextButton(
+      child: const Text("Ya"),
+      onPressed: () async {
+        if (context.mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const Login()),
+          );
+        }
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: const Text("Informasi"),
+      content: Text(message),
+      actions: [
+        continueButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 
   @override
@@ -66,9 +94,12 @@ class _RegisterState extends State<Register> {
                     height: 30,
                   ),
                   TextFormField(
+                    validator: (value) {
+                      return Validator.validateText(value ?? "", 'Nama');
+                    },
                     controller: nameController,
                     decoration: InputDecoration(
-                      hintText: "Name",
+                      hintText: "Nama",
                       isDense: true,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -79,6 +110,9 @@ class _RegisterState extends State<Register> {
                     height: 8,
                   ),
                   TextFormField(
+                    validator: (value) {
+                      return Validator.validateText(value ?? "", 'Email');
+                    },
                     controller: emailController,
                     decoration: InputDecoration(
                       hintText: "Email",
@@ -92,6 +126,9 @@ class _RegisterState extends State<Register> {
                     height: 8,
                   ),
                   TextFormField(
+                    validator: (value) {
+                      return Validator.validateText(value ?? "", 'Password');
+                    },
                     controller: passwordController,
                     decoration: InputDecoration(
                       hintText: "Password",

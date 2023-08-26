@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class DetailStory extends StatelessWidget {
+  static String routeName = "/detail";
   const DetailStory({super.key});
 
   @override

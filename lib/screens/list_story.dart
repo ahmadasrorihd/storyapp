@@ -5,9 +5,8 @@ import 'package:story_app/providers/api_provider.dart';
 import 'package:story_app/screens/add_story.dart';
 import 'package:story_app/screens/login.dart';
 
-import '../utils/constant.dart';
-
 class ListStory extends StatefulWidget {
+  static String routeName = "/list";
   const ListStory({super.key});
 
   @override
@@ -15,8 +14,6 @@ class ListStory extends StatefulWidget {
 }
 
 class _ListStoryState extends State<ListStory> {
-  String accessToken = "";
-
   showAlertDialog(BuildContext context) {
     Widget cancelButton = TextButton(
       child: const Text("Tidak"),
@@ -29,10 +26,12 @@ class _ListStoryState extends State<ListStory> {
       onPressed: () async {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.clear();
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const Login()),
-        );
+        if (context.mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const Login()),
+          );
+        }
       },
     );
 
@@ -54,23 +53,16 @@ class _ListStoryState extends State<ListStory> {
     );
   }
 
-  void getSession() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      accessToken = prefs.getString(keyToken)!;
-    });
-  }
-
   @override
   void initState() {
     super.initState();
-    getSession();
+
+    final dataProvider = Provider.of<ApiProvider>(context, listen: false);
+    dataProvider.allStory();
   }
 
   @override
   Widget build(BuildContext context) {
-    final dataProvider = Provider.of<ApiProvider>(context, listen: false);
-    dataProvider.allStory(accessToken);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue,
@@ -95,50 +87,45 @@ class _ListStoryState extends State<ListStory> {
             return const Center(
               child: CircularProgressIndicator(),
             );
-          } else if (data.errorMessage.isEmpty) {
-            return const Center(
-              child: Text('No Internet Connection'),
-            );
           } else {
-            return data.listStoryResult!.listStory.isEmpty
+            return data.listStoryResult.listStory.isEmpty
                 ? const Center(child: Text('No data found'))
                 : ListView.builder(
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,
                     primary: false,
                     padding: const EdgeInsets.all(10),
-                    itemCount: data.listStoryResult!.listStory.length,
+                    itemCount: data.listStoryResult.listStory.length,
                     itemBuilder: (BuildContext context, int index) {
-                      var story = data.listStoryResult!.listStory[index];
+                      var story = data.listStoryResult.listStory[index];
                       return ListTile(
                         onTap: () {},
                         contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 8.0),
+                            horizontal: 8.0, vertical: 4.0),
                         leading: Image.network(
                           story.photoUrl,
-                          width: 120,
+                          fit: BoxFit.cover,
+                          width: 100,
                           errorBuilder: (ctx, error, _) =>
                               const Center(child: Icon(Icons.error)),
                         ),
-                        title: Text(story.name),
+                        title: Text(
+                          story.description,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                         subtitle: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              children: [
-                                const Icon(Icons.pin_drop),
-                                Text(story.description),
-                              ],
+                            const SizedBox(
+                              height: 4,
                             ),
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.star,
-                                  color: Colors.yellow,
-                                ),
-                                Text(story.name),
-                              ],
-                            )
+                            Text(
+                              story.name,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            Text(story.createdAt.toString())
                           ],
                         ),
                       );

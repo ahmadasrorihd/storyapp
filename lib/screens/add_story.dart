@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AddStory extends StatefulWidget {
+  static String routeName = "/add";
   const AddStory({super.key});
 
   @override
