@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:story_app/providers/api_provider.dart';
 import 'package:story_app/screens/add_story.dart';
+import 'package:story_app/screens/detail_story.dart';
 import 'package:story_app/screens/login.dart';
 
 class ListStory extends StatefulWidget {
@@ -99,7 +100,10 @@ class _ListStoryState extends State<ListStory> {
                     itemBuilder: (BuildContext context, int index) {
                       var story = data.listStoryResult.listStory[index];
                       return ListTile(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.pushNamed(context, DetailStory.routeName,
+                              arguments: story.id);
+                        },
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 8.0, vertical: 4.0),
                         leading: Image.network(

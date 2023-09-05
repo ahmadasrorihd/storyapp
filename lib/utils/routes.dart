@@ -10,6 +10,8 @@ final Map<String, WidgetBuilder> routes = {
   Login.routeName: (context) => const Login(),
   Register.routeName: (context) => const Register(),
   ListStory.routeName: (context) => const ListStory(),
-  DetailStory.routeName: (context) => const DetailStory(),
+  DetailStory.routeName: (context) => DetailStory(
+        storyId: ModalRoute.of(context)?.settings.arguments as String,
+      ),
   AddStory.routeName: (context) => const AddStory(),
 };

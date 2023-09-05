@@ -1,7 +1,6 @@
 import 'package:awesome_dio_interceptor/awesome_dio_interceptor.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:story_app/models/add_story.dart';
 import 'package:story_app/models/detail_story.dart';
@@ -39,10 +38,11 @@ class ApiClient {
   }
 
   Future<DetailStoryResult> detailStory(String id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? token = prefs.getString(keyToken);
     try {
-      Response response = await _dio.get(
-        '$baseUrl/stories/$id',
-      );
+      Response response = await _dio.get('$baseUrl/stories/$id',
+          options: Options(headers: {"Authorization": "Bearer $token"}));
       return DetailStoryResult.fromJson(response.data);
     } on DioException catch (_) {
       rethrow;
