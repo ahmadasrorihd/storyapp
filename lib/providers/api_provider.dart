@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:story_app/models/add_story.dart';
 import 'package:story_app/models/detail_story.dart';
 import 'package:story_app/models/list_story.dart';
 
@@ -11,6 +14,8 @@ class ApiProvider with ChangeNotifier {
 
   late ListStoryResult _listStoryResult;
   late DetailStoryResult _detailStoryResult;
+  late AddStoryResult _addStoryResult;
+
   XFile? imageFile;
   String? imagePath;
 
@@ -20,6 +25,7 @@ class ApiProvider with ChangeNotifier {
 
   ListStoryResult get listStoryResult => _listStoryResult;
   DetailStoryResult get detailStoryResult => _detailStoryResult;
+  AddStoryResult get addStoryResult => _addStoryResult;
 
   bool get loading => _loading;
   String get errorMessage => _errorMessage;
@@ -50,6 +56,18 @@ class ApiProvider with ChangeNotifier {
     _loading = true;
     try {
       _detailStoryResult = await _apiClient.detailStory(id);
+    } catch (e) {
+      _errorMessage = e.toString();
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
+  }
+
+  Future addStory(XFile file, String description) async {
+    _loading = true;
+    try {
+      _addStoryResult = await _apiClient.addStory(file, description);
     } catch (e) {
       _errorMessage = e.toString();
     } finally {

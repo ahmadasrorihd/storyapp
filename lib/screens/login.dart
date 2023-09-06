@@ -22,16 +22,12 @@ class _LoginState extends State<Login> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final ApiClient _apiClient = ApiClient();
+  bool isSubmit = false;
 
   @override
   Widget build(BuildContext context) {
-    Future<void> login() async {
+    _login() async {
       if (_formKey.currentState!.validate()) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: const Text('Processing Data'),
-          backgroundColor: Colors.green.shade300,
-        ));
-
         try {
           LoginResult res = await _apiClient.login(
             emailController.text,
@@ -55,6 +51,9 @@ class _LoginState extends State<Login> {
           }
         }
       }
+      setState(() {
+        isSubmit = false;
+      });
     }
 
     return Scaffold(
@@ -103,20 +102,27 @@ class _LoginState extends State<Login> {
                   const SizedBox(
                     height: 30,
                   ),
-                  MaterialButton(
-                    height: 46.0,
-                    minWidth: double.infinity,
-                    color: Colors.blue,
-                    textColor: Colors.white,
-                    onPressed: login,
-                    child: const Text(
-                      "Login",
-                      style: TextStyle(
-                        fontSize: 14.0,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
+                  isSubmit
+                      ? const CircularProgressIndicator()
+                      : MaterialButton(
+                          height: 46.0,
+                          minWidth: double.infinity,
+                          color: Colors.blue,
+                          textColor: Colors.white,
+                          onPressed: () {
+                            setState(() {
+                              isSubmit = true;
+                            });
+                            _login();
+                          },
+                          child: const Text(
+                            "Login",
+                            style: TextStyle(
+                              fontSize: 14.0,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
                   const SizedBox(
                     height: 30,
                   ),

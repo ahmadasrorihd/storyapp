@@ -139,10 +139,12 @@ class _ListStoryState extends State<ListStory> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AddStory()),
-          );
+          Navigator.pushNamed(context, AddStory.routeName)
+              .then((value) => setState(() {
+                    final dataProvider =
+                        Provider.of<ApiProvider>(context, listen: false);
+                    dataProvider.allStory();
+                  }));
         },
         child: const Icon(Icons.add),
       ),

@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:awesome_dio_interceptor/awesome_dio_interceptor.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:story_app/models/add_story.dart';
 import 'package:story_app/models/detail_story.dart';
@@ -74,9 +77,21 @@ class ApiClient {
     }
   }
 
-  Future<AddStoryResult> addStory(String query) async {
+  Future<AddStoryResult> addStory(XFile file, String description) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? token = prefs.getString(keyToken);
+    String fileName = file.path.split('/').last;
+    FormData formData = FormData.fromMap({
+      "photo": await MultipartFile.fromFile(file.path, filename: fileName),
+      "description": description,
+    });
     try {
-      Response response = await _dio.post('$baseUrl/stories');
+      Response response = await _dio.post('$baseUrl/stories',
+          data: formData,
+          options: Options(headers: {
+            "Content-Type": "multipart/form-data",
+            "Authorization": "Bearer $token"
+          }));
       return AddStoryResult.fromJson(response.data);
     } on DioException catch (_) {
       rethrow;
