@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:story_app/providers/api_provider.dart';
+import 'package:story_app/screens/add_story.dart';
 import 'package:story_app/screens/detail_story.dart';
 import 'package:story_app/screens/list_story.dart';
 import 'package:story_app/screens/login.dart';
+import 'package:story_app/screens/register.dart';
 import 'package:story_app/utils/constant.dart';
-import 'package:story_app/utils/routes.dart';
 
 import 'core/api_client.dart';
 
@@ -22,7 +24,7 @@ Future<void> main() async {
   ));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   final bool? isLogin;
   const MyApp({
     Key? key,
@@ -30,23 +32,56 @@ class MyApp extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+final GoRouter _router = GoRouter(
+  routes: [
+    GoRoute(
+      path: '/',
+      builder: (BuildContext context, GoRouterState state) {
+        return const Login();
+      },
+    ),
+    GoRoute(
+      path: '/register',
+      builder: (BuildContext context, GoRouterState state) {
+        return const Register();
+      },
+    ),
+    GoRoute(
+      path: '/list',
+      builder: (BuildContext context, GoRouterState state) {
+        return const ListStory();
+      },
+    ),
+    GoRoute(
+      path: '/detail/:id',
+      builder: (BuildContext context, GoRouterState state) {
+        return DetailStory(
+          storyId: state.pathParameters['id']!,
+        );
+      },
+    ),
+    GoRoute(
+      path: '/add',
+      builder: (BuildContext context, GoRouterState state) {
+        return const AddStory();
+      },
+    ),
+  ],
+);
+
+class _MyAppState extends State<MyApp> {
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'StoryApp',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      initialRoute:
-          isLogin == null || false ? Login.routeName : ListStory.routeName,
-      routes: routes,
-      home: Navigator(
-        pages: const [
-          MaterialPage(key: ValueKey("StoryListPage"), child: ListStory()),
-          MaterialPage(key: ValueKey("StoryListPage"), child: DetailStory(storyId: storyId,))
-        ],
-        onPopPage: (route, result) {},
-      ),
+      routerConfig: _router,
     );
   }
 }

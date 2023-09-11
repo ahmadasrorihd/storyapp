@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:story_app/models/login.dart';
 import 'package:story_app/screens/list_story.dart';
@@ -26,7 +27,7 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
-    _login() async {
+    login() async {
       if (_formKey.currentState!.validate()) {
         try {
           LoginResult res = await _apiClient.login(
@@ -39,8 +40,7 @@ class _LoginState extends State<Login> {
           prefs.setString(keyToken, res.loginResult.token);
           prefs.setBool(keyIsLogin, true);
           if (context.mounted) {
-            Navigator.pushNamed(context, ListStory.routeName)
-                .then((value) => _formKey.currentState?.reset());
+            context.go('/list');
           }
         } on DioException catch (e) {
           if (context.mounted) {
@@ -113,7 +113,7 @@ class _LoginState extends State<Login> {
                             setState(() {
                               isSubmit = true;
                             });
-                            _login();
+                            login();
                           },
                           child: const Text(
                             "Login",

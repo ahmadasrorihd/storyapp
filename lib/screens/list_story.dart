@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:story_app/providers/api_provider.dart';
@@ -8,7 +9,9 @@ import 'package:story_app/screens/login.dart';
 
 class ListStory extends StatefulWidget {
   static String routeName = "/list";
-  const ListStory({super.key});
+  const ListStory({
+    super.key,
+  });
 
   @override
   State<ListStory> createState() => _ListStoryState();
@@ -101,8 +104,7 @@ class _ListStoryState extends State<ListStory> {
                       var story = data.listStoryResult.listStory[index];
                       return ListTile(
                         onTap: () {
-                          Navigator.pushNamed(context, DetailStory.routeName,
-                              arguments: story.id);
+                          context.go('/detail/${story.id}');
                         },
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 8.0, vertical: 4.0),
@@ -139,6 +141,7 @@ class _ListStoryState extends State<ListStory> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          context.go('/add');
           Navigator.pushNamed(context, AddStory.routeName)
               .then((value) => setState(() {
                     final dataProvider =
