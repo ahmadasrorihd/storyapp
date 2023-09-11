@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:story_app/providers/api_provider.dart';
+import 'package:story_app/screens/detail_story.dart';
 import 'package:story_app/screens/list_story.dart';
 import 'package:story_app/screens/login.dart';
 import 'package:story_app/utils/constant.dart';
@@ -39,6 +40,13 @@ class MyApp extends StatelessWidget {
       initialRoute:
           isLogin == null || false ? Login.routeName : ListStory.routeName,
       routes: routes,
+      home: Navigator(
+        pages: const [
+          MaterialPage(key: ValueKey("StoryListPage"), child: ListStory()),
+          MaterialPage(key: ValueKey("StoryListPage"), child: DetailStory(storyId: storyId,))
+        ],
+        onPopPage: (route, result) {},
+      ),
     );
   }
 }
