@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:story_app/providers/api_provider.dart';
 import 'package:story_app/screens/add_story.dart';
-import 'package:story_app/screens/detail_story.dart';
 import 'package:story_app/screens/login.dart';
 
 class ListStory extends StatefulWidget {
