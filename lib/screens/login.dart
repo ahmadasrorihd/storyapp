@@ -1,17 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 import 'package:story_app/models/login.dart';
-import 'package:story_app/screens/list_story.dart';
+import 'package:story_app/providers/auth_provider.dart';
 import 'package:story_app/screens/register.dart';
-import 'package:story_app/utils/constant.dart';
 import 'package:story_app/utils/validator.dart';
 
 import '../core/api_client.dart';
 
 class Login extends StatefulWidget {
-  static String routeName = "/login";
   const Login({super.key});
 
   @override
@@ -24,6 +21,18 @@ class _LoginState extends State<Login> {
   final TextEditingController passwordController = TextEditingController();
   final ApiClient _apiClient = ApiClient();
   bool isSubmit = false;
+  late AuthProvider _authProvider;
+
+  void onStartUp() async {
+    await _authProvider.onAppStart();
+  }
+
+  @override
+  void initState() {
+    _authProvider = Provider.of<AuthProvider>(context, listen: false);
+    onStartUp();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,13 +43,8 @@ class _LoginState extends State<Login> {
             emailController.text,
             passwordController.text,
           );
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          prefs.setString(keyName, res.loginResult.name);
-          prefs.setString(keyUserId, res.loginResult.userId);
-          prefs.setString(keyToken, res.loginResult.token);
-          prefs.setBool(keyIsLogin, true);
-          if (context.mounted) {
-            context.go('/list');
+          if (res.error == false) {
+            _authProvider.login();
           }
         } on DioException catch (e) {
           if (context.mounted) {

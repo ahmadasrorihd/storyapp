@@ -42,7 +42,7 @@ dependencies:
   awesome_dio_interceptor: ^1.0.0
   intl: ^0.18.1
   image_picker: ^1.0.4
-  go_router: ^10.1.2
+  go_router: ^11.1.2
 
 dev_dependencies:
   flutter_test:
