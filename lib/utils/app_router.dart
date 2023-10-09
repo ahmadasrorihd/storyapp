@@ -40,8 +40,8 @@ class AppRouter {
       GoRoute(
         path: APP_PAGE.detail.toPath,
         name: APP_PAGE.detail.toName,
-        builder: (context, state) => const DetailStory(
-          storyId: "2",
+        builder: (context, state) => DetailStory(
+          storyId: state.pathParameters['storyId'].toString(),
         ),
       )
     ],

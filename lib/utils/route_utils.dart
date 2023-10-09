@@ -12,7 +12,7 @@ extension AppPageExtension on APP_PAGE {
       case APP_PAGE.add:
         return "/add";
       case APP_PAGE.detail:
-        return "/detail";
+        return "/detail:storyId";
       default:
         return "/";
     }
