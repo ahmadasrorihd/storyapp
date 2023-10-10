@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:story_app/providers/api_provider.dart';
 import 'package:story_app/screens/add_story.dart';
-import 'package:story_app/screens/login.dart';
 
 class ListStory extends StatefulWidget {
   static String routeName = "/list";
@@ -29,12 +28,7 @@ class _ListStoryState extends State<ListStory> {
       onPressed: () async {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.clear();
-        if (context.mounted) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const Login()),
-          );
-        }
+        if (context.mounted) GoRouter.of(context).pushNamed("login");
       },
     );
 

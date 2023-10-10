@@ -1,72 +1,75 @@
-import 'dart:async';
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:story_app/core/api_client.dart';
 import 'package:story_app/providers/api_provider.dart';
-import 'package:story_app/providers/auth_provider.dart';
-import 'package:story_app/utils/app_router.dart';
+import 'package:story_app/screens/add_story.dart';
+import 'package:story_app/screens/detail_story.dart';
+import 'package:story_app/screens/list_story.dart';
+import 'package:story_app/screens/login.dart';
+import 'package:story_app/screens/register.dart';
+
+import 'core/api_client.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final SharedPreferences sharedPreferences =
-      await SharedPreferences.getInstance();
-  runApp(MyApp(sharedPreferences: sharedPreferences));
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool? statusLogin = prefs.getBool("isLogin");
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (_) => ApiProvider(apiClient: ApiClient()))
+    ],
+    child: MyApp(isLogin: statusLogin),
+  ));
 }
 
-class MyApp extends StatefulWidget {
-  final SharedPreferences sharedPreferences;
-  const MyApp({
+class MyApp extends StatelessWidget {
+  final bool? isLogin;
+  MyApp({
     Key? key,
-    required this.sharedPreferences,
+    required this.isLogin,
   }) : super(key: key);
 
-  @override
-  _MyAppState createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  late ApiProvider apiProvider;
-  late AuthProvider authProvider;
-  late StreamSubscription<bool> authSubscription;
-
-  @override
-  void initState() {
-    apiProvider = ApiProvider(apiClient: ApiClient());
-    authProvider = AuthProvider(widget.sharedPreferences);
-    authSubscription = authProvider.onAuthStateChange.listen(onAuthStateChange);
-    super.initState();
-  }
-
-  void onAuthStateChange(bool login) {
-    authProvider.loginState = login;
-  }
-
-  @override
-  void dispose() {
-    authSubscription.cancel();
-    super.dispose();
-  }
-
+  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider<ApiProvider>(create: (_) => apiProvider),
-        Provider<AuthProvider>(create: (_) => authProvider),
-      ],
-      child: Builder(
-        builder: (context) {
-          final GoRouter goRouter =
-              Provider.of<AppRouter>(context, listen: false).router;
-          return MaterialApp.router(
-            title: "Router App",
-            routeInformationParser: goRouter.routeInformationParser,
-            routerDelegate: goRouter.routerDelegate,
-          );
-        },
-      ),
+    return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      title: "StoryApp",
+      routerConfig: _router, // Pass context to _router
     );
   }
+
+  final GoRouter _router = GoRouter(
+    // redirect: (context, state) {
+    //   if (isLogin == null || false) {
+    //     return "/";
+    //   } else {
+    //     return "/list";
+    //   }
+    // },
+    routes: [
+      GoRoute(
+          path: "/", name: 'login', builder: (context, state) => const Login()),
+      GoRoute(
+          path: "/register",
+          name: 'register',
+          builder: (context, state) => const Register()),
+      GoRoute(
+          path: "/list",
+          name: 'list',
+          builder: (context, state) => const ListStory()),
+      GoRoute(
+          path: "/add",
+          name: 'add',
+          builder: (context, state) => const AddStory()),
+      GoRoute(
+          path: "/detail/:storyId",
+          name: 'detail',
+          builder: (context, state) => DetailStory(
+                storyId: state.pathParameters['storyId']!,
+              )),
+    ],
+  );
 }

@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:story_app/models/login.dart';
-import 'package:story_app/providers/auth_provider.dart';
 import 'package:story_app/screens/register.dart';
 import 'package:story_app/utils/validator.dart';
 
@@ -21,18 +21,6 @@ class _LoginState extends State<Login> {
   final TextEditingController passwordController = TextEditingController();
   final ApiClient _apiClient = ApiClient();
   bool isSubmit = false;
-  late AuthProvider _authProvider;
-
-  void onStartUp() async {
-    await _authProvider.onAppStart();
-  }
-
-  @override
-  void initState() {
-    _authProvider = Provider.of<AuthProvider>(context, listen: false);
-    onStartUp();
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,8 +32,13 @@ class _LoginState extends State<Login> {
             passwordController.text,
           );
           if (res.error == false) {
-            _authProvider.login();
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            prefs.setString('name', res.loginResult.name);
+            prefs.setString('token', res.loginResult.token);
+            prefs.setString('userId', res.loginResult.userId);
+            prefs.setBool('isLogin', true);
           }
+          if (context.mounted) GoRouter.of(context).pushNamed("list");
         } on DioException catch (e) {
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
