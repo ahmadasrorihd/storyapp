@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:story_app/models/register.dart';
 
 import '../core/api_client.dart';
@@ -126,6 +127,7 @@ class _RegisterState extends State<Register> {
                     height: 8,
                   ),
                   TextFormField(
+                    obscureText: true,
                     validator: (value) {
                       return Validator.validateText(value ?? "", 'Password');
                     },
@@ -164,11 +166,9 @@ class _RegisterState extends State<Register> {
                       const Text('Sudah punya akun ? '),
                       InkWell(
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const Login()),
-                            );
+                            if (context.mounted) {
+                              context.pushReplacementNamed('login');
+                            }
                           },
                           child: const Text(
                             'Login disini ',

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:story_app/core/api_client.dart';
@@ -67,7 +68,7 @@ class _AddStoryState extends State<AddStory> {
               content: Text(res.message),
               backgroundColor: Colors.green.shade300,
             ));
-            Navigator.pop(context, true);
+            context.pop(context);
           }
         }
       } on DioException catch (e) {

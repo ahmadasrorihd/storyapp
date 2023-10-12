@@ -38,7 +38,7 @@ class _LoginState extends State<Login> {
             prefs.setString('userId', res.loginResult.userId);
             prefs.setBool('isLogin', true);
           }
-          if (context.mounted) GoRouter.of(context).pushNamed("list");
+          if (context.mounted) context.pushReplacementNamed('list');
         } on DioException catch (e) {
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -84,6 +84,7 @@ class _LoginState extends State<Login> {
                     height: 8,
                   ),
                   TextFormField(
+                    obscureText: true,
                     validator: (value) {
                       return Validator.validateText(value ?? "", 'Password');
                     },

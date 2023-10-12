@@ -15,20 +15,21 @@ class ListStory extends StatefulWidget {
   State<ListStory> createState() => _ListStoryState();
 }
 
-class _ListStoryState extends State<ListStory> {
+class _ListStoryState extends State<ListStory> with WidgetsBindingObserver {
   showAlertDialog(BuildContext context) {
     Widget cancelButton = TextButton(
       child: const Text("Tidak"),
       onPressed: () {
-        Navigator.pop(context);
+        context.pop(context);
       },
     );
     Widget continueButton = TextButton(
       child: const Text("Ya"),
       onPressed: () async {
         SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setBool('isLogin', false);
         prefs.clear();
-        if (context.mounted) GoRouter.of(context).pushNamed("login");
+        if (context.mounted) context.pushReplacementNamed('login');
       },
     );
 
@@ -53,9 +54,23 @@ class _ListStoryState extends State<ListStory> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
 
     final dataProvider = Provider.of<ApiProvider>(context, listen: false);
     dataProvider.allStory();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      setState(() {});
+    }
   }
 
   @override
@@ -97,7 +112,8 @@ class _ListStoryState extends State<ListStory> {
                       var story = data.listStoryResult.listStory[index];
                       return ListTile(
                         onTap: () {
-                          context.go('/detail/${story.id}');
+                          context.pushNamed('detail',
+                              pathParameters: {'storyId': story.id});
                         },
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 8.0, vertical: 4.0),
@@ -134,13 +150,11 @@ class _ListStoryState extends State<ListStory> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context.go('/add');
-          Navigator.pushNamed(context, AddStory.routeName)
-              .then((value) => setState(() {
-                    final dataProvider =
-                        Provider.of<ApiProvider>(context, listen: false);
-                    dataProvider.allStory();
-                  }));
+          context.pushNamed('add').then((value) => setState(() {
+                final dataProvider =
+                    Provider.of<ApiProvider>(context, listen: false);
+                dataProvider.allStory();
+              }));
         },
         child: const Icon(Icons.add),
       ),
