@@ -11,7 +11,6 @@ import 'package:story_app/models/add_story.dart';
 import 'package:story_app/providers/api_provider.dart';
 
 class AddStory extends StatefulWidget {
-  static String routeName = "/add";
   const AddStory({super.key});
 
   @override

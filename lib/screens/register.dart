@@ -5,10 +5,8 @@ import 'package:story_app/models/register.dart';
 
 import '../core/api_client.dart';
 import '../utils/validator.dart';
-import 'login.dart';
 
 class Register extends StatefulWidget {
-  static String routeName = "/register";
   const Register({super.key});
 
   @override
@@ -54,10 +52,7 @@ class _RegisterState extends State<Register> {
       child: const Text("Ya"),
       onPressed: () async {
         if (context.mounted) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const Login()),
-          );
+          context.pushNamed('login');
         }
       },
     );

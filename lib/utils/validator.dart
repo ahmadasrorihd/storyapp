@@ -9,14 +9,6 @@ class Validator {
     }
   }
 
-  static String? validateConfirmPassword(String value, String password) {
-    if (value != password) {
-      return 'Password tidak sama';
-    } else {
-      return null;
-    }
-  }
-
   static String? validateText(String value, String type) {
     if (value.isEmpty) {
       return 'Harap masukkan $type';

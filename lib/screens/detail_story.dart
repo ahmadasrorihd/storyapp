@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:story_app/providers/api_provider.dart';
 
 class DetailStory extends StatefulWidget {
-  static String routeName = "/detail";
   final String storyId;
   const DetailStory({super.key, required this.storyId});
 

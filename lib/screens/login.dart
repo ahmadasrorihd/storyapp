@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:story_app/models/login.dart';
-import 'package:story_app/screens/register.dart';
+import 'package:story_app/utils/constant.dart';
 import 'package:story_app/utils/validator.dart';
 
 import '../core/api_client.dart';
@@ -33,10 +33,10 @@ class _LoginState extends State<Login> {
           );
           if (res.error == false) {
             SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.setString('name', res.loginResult.name);
-            prefs.setString('token', res.loginResult.token);
-            prefs.setString('userId', res.loginResult.userId);
-            prefs.setBool('isLogin', true);
+            prefs.setString(keyName, res.loginResult.name);
+            prefs.setString(keyToken, res.loginResult.token);
+            prefs.setString(keyUserId, res.loginResult.userId);
+            prefs.setBool(keyIsLogin, true);
           }
           if (context.mounted) context.pushReplacementNamed('list');
         } on DioException catch (e) {
@@ -130,11 +130,7 @@ class _LoginState extends State<Login> {
                       const Text('Belum punya akun ? '),
                       InkWell(
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const Register()),
-                            );
+                            context.pushNamed('register');
                           },
                           child: const Text(
                             'Register disini ',

@@ -8,41 +8,37 @@ import 'package:story_app/screens/detail_story.dart';
 import 'package:story_app/screens/list_story.dart';
 import 'package:story_app/screens/login.dart';
 import 'package:story_app/screens/register.dart';
+import 'package:story_app/screens/splashscreen.dart';
+import 'package:story_app/utils/constant.dart';
 
 import 'core/api_client.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  bool? statusLogin = prefs.getBool("isLogin");
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => ApiProvider(apiClient: ApiClient()))
     ],
-    child: MyApp(isLogin: statusLogin),
+    child: MyApp(),
   ));
 }
 
 class MyApp extends StatelessWidget {
-  final bool? isLogin;
   final GoRouter _router;
 
   MyApp({
     Key? key,
-    required this.isLogin,
   })  : _router = GoRouter(
           routes: [
             GoRoute(
               path: "/",
+              name: 'splashscreen',
+              builder: (context, state) => const SplashScreen(),
+            ),
+            GoRoute(
+              path: "/login",
               name: 'login',
               builder: (context, state) => const Login(),
-              redirect: (context, state) {
-                if (isLogin == null || false) {
-                  return "/";
-                } else {
-                  return "/list";
-                }
-              },
             ),
             GoRoute(
                 path: "/register",

@@ -3,10 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:story_app/providers/api_provider.dart';
-import 'package:story_app/screens/add_story.dart';
+import 'package:story_app/utils/constant.dart';
 
 class ListStory extends StatefulWidget {
-  static String routeName = "/list";
   const ListStory({
     super.key,
   });
@@ -26,10 +25,11 @@ class _ListStoryState extends State<ListStory> with WidgetsBindingObserver {
     Widget continueButton = TextButton(
       child: const Text("Ya"),
       onPressed: () async {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setBool('isLogin', false);
-        prefs.clear();
         if (context.mounted) context.pushReplacementNamed('login');
+
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setBool(keyIsLogin, false);
+        prefs.clear();
       },
     );
 
