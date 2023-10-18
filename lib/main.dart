@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:story_app/providers/api_provider.dart';
+import 'package:story_app/screens/add_location.dart';
 import 'package:story_app/screens/add_story.dart';
 import 'package:story_app/screens/detail_story.dart';
 import 'package:story_app/screens/list_story.dart';
@@ -52,6 +53,10 @@ class MyApp extends StatelessWidget {
                 path: "/add",
                 name: 'add',
                 builder: (context, state) => const AddStory()),
+            GoRoute(
+                path: "/location",
+                name: 'location',
+                builder: (context, state) => const AddLocation()),
             GoRoute(
                 path: "/detail/:storyId",
                 name: 'detail',

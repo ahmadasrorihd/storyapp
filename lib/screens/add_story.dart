@@ -22,6 +22,7 @@ class _AddStoryState extends State<AddStory> {
   final TextEditingController descriptionController = TextEditingController();
   final ApiClient _apiClient = ApiClient();
   bool isSubmit = false;
+  bool isShareLocation = false;
 
   _onGalleryView() async {
     final provider = context.read<ApiProvider>();
@@ -176,7 +177,25 @@ class _AddStoryState extends State<AddStory> {
                     ),
                   ),
                   const SizedBox(
-                    height: 30,
+                    height: 8,
+                  ),
+                  InkWell(
+                    onTap: () {
+                      if (context.mounted) context.pushNamed('location');
+                    },
+                    child: Container(
+                        width: double.maxFinite,
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.grey)),
+                        child: const Text(
+                          'Add location',
+                          style: TextStyle(color: Colors.grey),
+                        )),
+                  ),
+                  const SizedBox(
+                    height: 15,
                   ),
                   isSubmit
                       ? const CircularProgressIndicator()
