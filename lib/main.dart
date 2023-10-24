@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:story_app/providers/api_provider.dart';
 import 'package:story_app/screens/add_location.dart';
 import 'package:story_app/screens/add_story.dart';
@@ -10,7 +9,6 @@ import 'package:story_app/screens/list_story.dart';
 import 'package:story_app/screens/login.dart';
 import 'package:story_app/screens/register.dart';
 import 'package:story_app/screens/splashscreen.dart';
-import 'package:story_app/utils/constant.dart';
 
 import 'core/api_client.dart';
 
@@ -48,7 +46,7 @@ class MyApp extends StatelessWidget {
             GoRoute(
                 path: "/list",
                 name: 'list',
-                builder: (context, state) => const ListStory()),
+                builder: (context, state) => const ListStoryPage()),
             GoRoute(
                 path: "/add",
                 name: 'add',

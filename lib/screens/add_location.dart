@@ -1,16 +1,7 @@
-import 'dart:io';
-
-import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:place_picker/entities/location_result.dart';
-import 'package:place_picker/widgets/place_picker.dart';
-import 'package:provider/provider.dart';
-import 'package:story_app/core/api_client.dart';
-import 'package:story_app/models/add_story.dart';
-import 'package:story_app/providers/api_provider.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class AddLocation extends StatefulWidget {
   const AddLocation({super.key});
@@ -20,29 +11,71 @@ class AddLocation extends StatefulWidget {
 }
 
 class _AddLocationState extends State<AddLocation> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController descriptionController = TextEditingController();
+  late LatLng dicodingOffice = const LatLng(-6.8957473, 107.6337669);
+  late String result;
+  late GoogleMapController mapController;
+  String address = "";
+  int count = 0;
+  Set<Marker> markers = {};
 
-  void showPlacePicker() async {
-    LocationResult? result = await Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) =>
-            PlacePicker("AIzaSyClZx1H8kqe2ekaybnqVykf416ySk_C4B0")));
+  void _addMarker(LatLng position) {
+    setState(() {
+      placemarkFromCoordinates(position.latitude, position.longitude)
+          .then((value) {
+        if (value.isNotEmpty) {
+          setState(() {
+            address =
+                "${value[0].locality} ${value[0].subAdministrativeArea} ${value[0].administrativeArea}";
+          });
+        }
+      });
+      markers.clear();
+      markers.add(
+        Marker(
+          markerId: MarkerId(position.toString()),
+          position: position,
+          infoWindow: InfoWindow(
+            title: address,
+          ),
+        ),
+      );
+    });
+  }
 
-    // Handle the result in your way
-    print(result);
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Picker Example')),
+      appBar: AppBar(
+        title: const Text('Add Location'),
+        actions: [
+          IconButton(
+              onPressed: () {
+                context.pop(result);
+              },
+              icon: const Icon(Icons.done))
+        ],
+      ),
       body: Center(
-        child: TextButton(
-          child: const Text("Pick Delivery location"),
-          onPressed: () {
-            showPlacePicker();
-          },
-        ),
+        child: GoogleMap(
+            markers: markers,
+            onTap: (LatLng tappedPosition) {
+              result =
+                  "${tappedPosition.latitude}, ${tappedPosition.longitude}";
+              _addMarker(tappedPosition);
+            },
+            onMapCreated: (controller) {
+              setState(() {
+                mapController = controller;
+              });
+            },
+            myLocationButtonEnabled: true,
+            initialCameraPosition:
+                CameraPosition(zoom: 18, target: dicodingOffice)),
       ),
     );
   }

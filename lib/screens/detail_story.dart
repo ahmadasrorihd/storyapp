@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:story_app/providers/api_provider.dart';
@@ -12,6 +14,7 @@ class DetailStory extends StatefulWidget {
 }
 
 class _DetailStoryState extends State<DetailStory> {
+  String address = "";
   @override
   void initState() {
     super.initState();
@@ -34,11 +37,36 @@ class _DetailStoryState extends State<DetailStory> {
             );
           } else {
             var story = data.detailStoryResult.story;
+            placemarkFromCoordinates(story.lat!, story.lon!).then((value) {
+              if (value.isNotEmpty) {
+                setState(() {
+                  address =
+                      "${value[0].administrativeArea}, ${value[0].country}";
+                });
+              }
+            });
             return SingleChildScrollView(
               child: Column(
                 children: [
                   Image.network(story.photoUrl,
                       fit: BoxFit.cover, height: 250, width: double.infinity),
+                  if (story.lat != null)
+                    SizedBox(
+                      height: 250,
+                      child: GoogleMap(
+                          markers: {
+                            Marker(
+                              markerId: MarkerId(story.id),
+                              position: LatLng(story.lat!, story.lon!),
+                              infoWindow: InfoWindow(
+                                title: address,
+                              ), // InfoWindow
+                            )
+                          },
+                          initialCameraPosition: CameraPosition(
+                              zoom: 18,
+                              target: LatLng(story.lat!, story.lon!))),
+                    ),
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(

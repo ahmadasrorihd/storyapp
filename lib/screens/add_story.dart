@@ -3,12 +3,15 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:story_app/core/api_client.dart';
 import 'package:story_app/models/add_story.dart';
 import 'package:story_app/providers/api_provider.dart';
+import 'package:story_app/utils/validator.dart';
 
 class AddStory extends StatefulWidget {
   const AddStory({super.key});
@@ -23,6 +26,9 @@ class _AddStoryState extends State<AddStory> {
   final ApiClient _apiClient = ApiClient();
   bool isSubmit = false;
   bool isShareLocation = false;
+  bool isLocationExist = false;
+  String address = "";
+  String result = "";
 
   _onGalleryView() async {
     final provider = context.read<ApiProvider>();
@@ -57,27 +63,57 @@ class _AddStoryState extends State<AddStory> {
 
   _onSubmitStory() async {
     final provider = context.read<ApiProvider>();
-
-    if (_formKey.currentState!.validate()) {
-      try {
-        AddStoryResult res = await _apiClient.addStory(
-            provider.imageFile!, descriptionController.text);
-        if (!res.error) {
+    if (provider.imageFile != null) {
+      if (_formKey.currentState!.validate()) {
+        try {
+          if (result.isEmpty) {
+            AddStoryResult res = await _apiClient.addStory(
+              provider.imageFile!,
+              descriptionController.text,
+            );
+            if (!res.error) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text(res.message),
+                  backgroundColor: Colors.green.shade300,
+                ));
+                context.pop(context);
+                provider.setImagePath(null);
+              }
+            }
+          } else {
+            AddStoryResult res = await _apiClient.addStoryWithLocation(
+              provider.imageFile!,
+              descriptionController.text,
+              convertLat(result),
+              convertLon(result),
+            );
+            if (!res.error) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text(res.message),
+                  backgroundColor: Colors.green.shade300,
+                ));
+                context.pop(context);
+                provider.setImagePath(null);
+              }
+            }
+          }
+        } on DioException catch (e) {
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(res.message),
-              backgroundColor: Colors.green.shade300,
+              content: Text(e.response!.data.toString()),
+              backgroundColor: Colors.red.shade300,
             ));
-            context.pop(context);
           }
         }
-      } on DioException catch (e) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(e.response!.data.toString()),
-            backgroundColor: Colors.red.shade300,
-          ));
-        }
+      }
+    } else {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: const Text("Harap pilih gambar terlebih dahulu"),
+          backgroundColor: Colors.red.shade300,
+        ));
       }
     }
     setState(() {
@@ -96,6 +132,48 @@ class _AddStoryState extends State<AddStory> {
             File(imagePath.toString()),
             fit: BoxFit.contain,
           );
+  }
+
+  LatLng? convertStringToLatLng(String locationString) {
+    List<String> parts = locationString
+        .split(','); // Split the string using a comma as the separator
+    if (parts.length == 2) {
+      double? latitude = double.tryParse(parts[0].trim());
+      double? longitude = double.tryParse(parts[1].trim());
+
+      if (latitude != null && longitude != null) {
+        return LatLng(latitude, longitude);
+      }
+    }
+    // Handle invalid input or parsing errors
+    return null;
+  }
+
+  double? convertLat(String locationString) {
+    List<String> parts = locationString
+        .split(','); // Split the string using a comma as the separator
+    if (parts.length == 2) {
+      double? latitude = double.tryParse(parts[0].trim());
+      if (latitude != null) {
+        return latitude;
+      }
+    }
+    // Handle invalid input or parsing errors
+    return null;
+  }
+
+  double? convertLon(String locationString) {
+    List<String> parts = locationString
+        .split(','); // Split the string using a comma as the separator
+    if (parts.length == 2) {
+      double? longitude = double.tryParse(parts[1].trim());
+
+      if (longitude != null) {
+        return longitude;
+      }
+    }
+    // Handle invalid input or parsing errors
+    return null;
   }
 
   @override
@@ -165,6 +243,10 @@ class _AddStoryState extends State<AddStory> {
                   SizedBox(
                     height: 120,
                     child: TextFormField(
+                      validator: (value) {
+                        return Validator.validateText(
+                            value ?? "", 'Description');
+                      },
                       controller: descriptionController,
                       maxLines: 5,
                       decoration: InputDecoration(
@@ -180,8 +262,24 @@ class _AddStoryState extends State<AddStory> {
                     height: 8,
                   ),
                   InkWell(
-                    onTap: () {
-                      if (context.mounted) context.pushNamed('location');
+                    onTap: () async {
+                      String? val = await context.pushNamed('location');
+                      setState(() {
+                        result = val.toString();
+                        isLocationExist = true;
+                        LatLng locationResult =
+                            convertStringToLatLng(val.toString())!;
+                        placemarkFromCoordinates(locationResult.latitude,
+                                locationResult.longitude)
+                            .then((value) {
+                          if (value.isNotEmpty) {
+                            setState(() {
+                              address =
+                                  "${value[0].locality} ${value[0].subAdministrativeArea} ${value[0].administrativeArea}";
+                            });
+                          }
+                        });
+                      });
                     },
                     child: Container(
                         width: double.maxFinite,
@@ -189,9 +287,9 @@ class _AddStoryState extends State<AddStory> {
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(color: Colors.grey)),
-                        child: const Text(
-                          'Add location',
-                          style: TextStyle(color: Colors.grey),
+                        child: Text(
+                          isLocationExist ? address : "Add Location",
+                          style: const TextStyle(color: Colors.grey),
                         )),
                   ),
                   const SizedBox(

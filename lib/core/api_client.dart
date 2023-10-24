@@ -25,12 +25,12 @@ class ApiClient {
     );
   }
 
-  Future<ListStoryResult> allStory() async {
+  Future<ListStoryResult> allStory(int page) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? token = prefs.getString(keyToken);
     try {
       Response response = await _dio.get(
-          '$baseUrl/stories?page=1&limit=10&location=0',
+          '$baseUrl/stories?page=$page&limit=10&location=1',
           options: Options(headers: {"Authorization": "Bearer $token"}));
       return ListStoryResult.fromJson(response.data);
     } on DioException catch (_) {
@@ -82,6 +82,30 @@ class ApiClient {
     FormData formData = FormData.fromMap({
       "photo": await MultipartFile.fromFile(file.path, filename: fileName),
       "description": description,
+    });
+    try {
+      Response response = await _dio.post('$baseUrl/stories',
+          data: formData,
+          options: Options(headers: {
+            "Content-Type": "multipart/form-data",
+            "Authorization": "Bearer $token"
+          }));
+      return AddStoryResult.fromJson(response.data);
+    } on DioException catch (_) {
+      rethrow;
+    }
+  }
+
+  Future<AddStoryResult> addStoryWithLocation(
+      XFile file, String description, double? lat, double? lon) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? token = prefs.getString(keyToken);
+    String fileName = file.path.split('/').last;
+    FormData formData = FormData.fromMap({
+      "photo": await MultipartFile.fromFile(file.path, filename: fileName),
+      "description": description,
+      "lat": lat,
+      "lon": lon,
     });
     try {
       Response response = await _dio.post('$baseUrl/stories',
