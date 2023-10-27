@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:story_app/core/api_client.dart';
-import 'package:story_app/models/list_story.dart';
-import 'package:story_app/providers/api_provider.dart';
+import 'package:story_app/models/list_story_result.dart';
 import 'package:story_app/utils/constant.dart';
 
 class ListStoryPage extends StatefulWidget {
@@ -233,6 +231,8 @@ class _ListStoryPageState extends State<ListStoryPage>
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           context.pushNamed('add').then((value) => setState(() {
+                _page = 1;
+
                 _firstLoad();
               }));
         },

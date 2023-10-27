@@ -1,10 +1,8 @@
-import 'dart:convert';
+import 'package:json_annotation/json_annotation.dart';
 
-AddStoryResult addStoryResultFromJson(String str) =>
-    AddStoryResult.fromJson(json.decode(str));
+part 'add_story.g.dart';
 
-String addStoryResultToJson(AddStoryResult data) => json.encode(data.toJson());
-
+@JsonSerializable()
 class AddStoryResult {
   bool error;
   String message;
@@ -14,13 +12,8 @@ class AddStoryResult {
     required this.message,
   });
 
-  factory AddStoryResult.fromJson(Map<String, dynamic> json) => AddStoryResult(
-        error: json["error"],
-        message: json["message"],
-      );
+  factory AddStoryResult.fromJson(Map<String, dynamic> json) =>
+      _$AddStoryFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        "error": error,
-        "message": message,
-      };
+  Map<String, dynamic> toJson() => _$AddStoryToJson(this);
 }

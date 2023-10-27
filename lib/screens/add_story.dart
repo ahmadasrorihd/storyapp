@@ -77,7 +77,7 @@ class _AddStoryState extends State<AddStory> {
                   content: Text(res.message),
                   backgroundColor: Colors.green.shade300,
                 ));
-                context.pop(context);
+                context.pop(true);
                 provider.setImagePath(null);
               }
             }

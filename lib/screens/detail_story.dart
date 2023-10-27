@@ -41,8 +41,9 @@ class _DetailStoryState extends State<DetailStory> {
               if (value.isNotEmpty) {
                 setState(() {
                   address =
-                      "${value[0].administrativeArea}, ${value[0].country}";
+                      "${value[0].street} ${value[0].subLocality} ${value[0].locality} ${value[0].subAdministrativeArea} ${value[0].administrativeArea} ${value[0].postalCode} ${value[0].country}";
                 });
+                print("VALUENYA " + value.toString());
               }
             });
             return SingleChildScrollView(

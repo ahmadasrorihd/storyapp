@@ -5,8 +5,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:story_app/models/add_story.dart';
 import 'package:story_app/models/detail_story.dart';
-import 'package:story_app/models/list_story.dart';
-import 'package:story_app/models/login.dart';
+import 'package:story_app/models/list_story_result.dart';
+import 'package:story_app/models/login_result.dart';
 import 'package:story_app/models/register.dart';
 
 import '../utils/constant.dart';

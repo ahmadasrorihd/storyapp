@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:story_app/models/login.dart';
+import 'package:story_app/models/login_result.dart';
 import 'package:story_app/utils/constant.dart';
 import 'package:story_app/utils/validator.dart';
 

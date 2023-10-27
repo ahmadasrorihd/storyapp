@@ -1,37 +1,8 @@
-import 'dart:convert';
+import 'package:json_annotation/json_annotation.dart';
 
-ListStoryResult listStoryResultFromJson(String str) =>
-    ListStoryResult.fromJson(json.decode(str));
+part 'list_story.g.dart';
 
-String listStoryResultToJson(ListStoryResult data) =>
-    json.encode(data.toJson());
-
-class ListStoryResult {
-  bool error;
-  String message;
-  List<ListStory> listStory;
-
-  ListStoryResult({
-    required this.error,
-    required this.message,
-    required this.listStory,
-  });
-
-  factory ListStoryResult.fromJson(Map<String, dynamic> json) =>
-      ListStoryResult(
-        error: json["error"],
-        message: json["message"],
-        listStory: List<ListStory>.from(
-            json["listStory"].map((x) => ListStory.fromJson(x))),
-      );
-
-  Map<String, dynamic> toJson() => {
-        "error": error,
-        "message": message,
-        "listStory": List<dynamic>.from(listStory.map((x) => x.toJson())),
-      };
-}
-
+@JsonSerializable()
 class ListStory {
   String id;
   String name;
@@ -51,23 +22,8 @@ class ListStory {
     required this.lon,
   });
 
-  factory ListStory.fromJson(Map<String, dynamic> json) => ListStory(
-        id: json["id"],
-        name: json["name"],
-        description: json["description"],
-        photoUrl: json["photoUrl"],
-        createdAt: DateTime.parse(json["createdAt"]),
-        lat: json["lat"]?.toDouble(),
-        lon: json["lon"]?.toDouble(),
-      );
+  factory ListStory.fromJson(Map<String, dynamic> json) =>
+      _$ListStoryFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "description": description,
-        "photoUrl": photoUrl,
-        "createdAt": createdAt.toIso8601String(),
-        "lat": lat,
-        "lon": lon,
-      };
+  Map<String, dynamic> toJson() => _$ListStoryToJson(this);
 }
