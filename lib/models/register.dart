@@ -13,7 +13,7 @@ class RegisterResult {
   });
 
   factory RegisterResult.fromJson(Map<String, dynamic> json) =>
-      _$RegisterFromJson(json);
+      _$RegisterResultFromJson(json);
 
-  Map<String, dynamic> toJson() => _$RegisterToJson(this);
+  Map<String, dynamic> toJson() => _$RegisterResultToJson(this);
 }

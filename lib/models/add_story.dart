@@ -13,7 +13,7 @@ class AddStoryResult {
   });
 
   factory AddStoryResult.fromJson(Map<String, dynamic> json) =>
-      _$AddStoryFromJson(json);
+      _$AddStoryResultFromJson(json);
 
-  Map<String, dynamic> toJson() => _$AddStoryToJson(this);
+  Map<String, dynamic> toJson() => _$AddStoryResultToJson(this);
 }

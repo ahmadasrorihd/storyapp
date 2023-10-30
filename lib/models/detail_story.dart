@@ -1,5 +1,4 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:story_app/models/story.dart';
 
 part 'detail_story.g.dart';
 
@@ -7,6 +6,8 @@ part 'detail_story.g.dart';
 class DetailStoryResult {
   bool error;
   String message;
+
+  @JsonKey(fromJson: _storyFromJson, toJson: _storyToJson)
   Story story;
 
   DetailStoryResult({
@@ -16,12 +17,18 @@ class DetailStoryResult {
   });
 
   factory DetailStoryResult.fromJson(Map<String, dynamic> json) =>
-      _$DetailStoryFromJson(json);
+      _$DetailStoryResultFromJson(json);
 
-  Map<String, dynamic> toJson() => _$DetailStoryToJson(this);
+  Map<String, dynamic> toJson() => _$DetailStoryResultToJson(this);
+
+  static Story _storyFromJson(Map<String, dynamic> json) {
+    return Story.fromJson(json);
+  }
+
+  static Map<String, dynamic> _storyToJson(Story story) {
+    return story.toJson();
+  }
 }
-
-part 'story.g.dart';
 
 @JsonSerializable()
 class Story {

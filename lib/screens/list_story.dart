@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:story_app/core/api_client.dart';
+import 'package:story_app/models/list_story.dart';
 import 'package:story_app/models/list_story_result.dart';
 import 'package:story_app/utils/constant.dart';
 
