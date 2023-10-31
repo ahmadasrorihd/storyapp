@@ -29,8 +29,7 @@ class ApiClient {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? token = prefs.getString(keyToken);
     try {
-      Response response = await _dio.get(
-          '$baseUrl/stories?page=$page&limit=10&location=1',
+      Response response = await _dio.get('$baseUrl/stories?page=$page&limit=10',
           options: Options(headers: {"Authorization": "Bearer $token"}));
       return ListStoryResult.fromJson(response.data);
     } on DioException catch (_) {

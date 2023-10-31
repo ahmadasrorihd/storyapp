@@ -37,21 +37,22 @@ class _DetailStoryState extends State<DetailStory> {
             );
           } else {
             var story = data.detailStoryResult.story;
-            placemarkFromCoordinates(story.lat!, story.lon!).then((value) {
-              if (value.isNotEmpty) {
-                setState(() {
-                  address =
-                      "${value[0].street} ${value[0].subLocality} ${value[0].locality} ${value[0].subAdministrativeArea} ${value[0].administrativeArea} ${value[0].postalCode} ${value[0].country}";
-                });
-                print("VALUENYA " + value.toString());
-              }
-            });
+            if (story.lat != null && story.lon != null) {
+              placemarkFromCoordinates(story.lat!, story.lon!).then((value) {
+                if (value.isNotEmpty) {
+                  setState(() {
+                    address =
+                        "${value[0].street} ${value[0].subLocality} ${value[0].locality} ${value[0].subAdministrativeArea} ${value[0].administrativeArea} ${value[0].postalCode} ${value[0].country}";
+                  });
+                }
+              });
+            }
             return SingleChildScrollView(
               child: Column(
                 children: [
                   Image.network(story.photoUrl,
                       fit: BoxFit.cover, height: 250, width: double.infinity),
-                  if (story.lat != null)
+                  if (story.lat != null && story.lon != null)
                     SizedBox(
                       height: 250,
                       child: GoogleMap(
